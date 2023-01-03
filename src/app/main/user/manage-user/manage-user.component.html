@@ -1,0 +1,295 @@
+<!-- Page header -->
+<div class="page-header page-header-default">
+	<div class="page-header-content">
+		<div class="page-title">
+			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Người dùng</span> - Quản lý
+				người dùng</h4>
+		</div>
+
+		<div class="heading-elements">
+			<div class="heading-btn-group">
+				<a (click)="createModal()" class="btn btn-link btn-float has-text"><i
+						class="icon-plus22 text-primary"></i><span>Thêm người dùng</span></a>
+			</div>
+		</div>
+	</div>
+
+	<div class="breadcrumb-line">
+		<ul class="breadcrumb">
+			<li><a href="index.html"><i class="icon-home2 position-left"></i> Trang chủ</a></li>
+			<li><a href="datatable_basic.html">Người dùng</a></li>
+			<li class="active">Quản lý người dùng</li>
+		</ul>
+	</div>
+</div>
+<!-- /page header -->
+<!-- Content area -->
+<div class="content">
+	<div class="row">
+		<div class="col-md-12">
+
+			<!-- Basic layout-->
+			<form [formGroup]="frmSearch" class="form-horizontal" (ngSubmit)="LoadData()" >
+				<div class="panel panel-flat">
+					<div class="panel-heading">
+						<h5 class="panel-title">Tìm kiếm</h5>
+					</div>
+
+					<div class="panel-body">
+						<div class="form-group">
+							<label class="col-lg-2 control-label" style="text-align:right ;">Họ tên:</label>
+							<div class="col-lg-8">
+								<input formControlName="txt_hoten" type="text" class="form-control" placeholder="Họ tên">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label" style="text-align:right ;">Tài khoản:</label>
+							<div class="col-lg-3">
+								<input formControlName="txt_taikhoan" type="text" class="form-control" placeholder="Tài khoản">
+							</div>
+							<label class="col-lg-2 control-label" style="text-align:right ;">Loại quyền:</label>
+							<div class="col-lg-3">
+								<select formControlName="txt_loaiquyen" class="LoaiQuyen">
+									<option [value]="'All'">Tất cả</option>
+									<option [value]="'Admin'">Admin</option>
+									<option [value]="'User'">User</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-lg-10 text-right">
+							<button type="submit" class="btn btn-primary"><i class="icon-search4 position-right"></i> Tìm kiếm</button>
+						</div>
+					</div>
+				</div>
+			</form>
+			<!-- /basic layout -->
+		</div>
+	</div>
+
+
+	<!-- Basic datatable -->
+	<div class="panel panel-flat">
+		<div class="panel-heading">
+			<h5 class="panel-title">DANH SÁCH THÔNG TIN NGƯỜI DÙNG</h5>
+		</div>
+
+		<table class="table datatable-basic">
+			<thead>
+				<tr>
+					<th>Họ tên</th>
+					<th>Địa chỉ</th>
+					<th>Số điện thoại</th>
+					<th>Tên tài khoản</th>
+					<th>Trạng thái</th>
+					<th class="text-center">Hành động</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let ur of list_users">
+					<td>{{ur.hoTen}}</td>
+					<td>{{ur.diaChi}}</td>
+					<td>{{ur.dienThoai}}</td>
+					<td>{{ur.taiKhoan}}</td>
+					<td><span class="label label-success">Active</span></td>
+					<td class="text-center">
+						<ul class="icons-list">
+							<li><a (click)="openUpdateModal(ur.maNguoiDung)"><i class="icon-pencil7"></i></a></li>
+							<li><a (click)="onRemove(ur.maNguoiDung)"><i class="icon-trash"></i></a></li>
+						</ul>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<!-- /basic datatable -->
+	<!-- Footer -->
+	<div class="footer text-muted">
+		&copy; 2015. <a href="#">Limitless Web App Kit</a> by <a href="http://themeforest.net/user/Kopyov"
+			target="_blank">Eugene Kopyov</a>
+	</div>
+	<!-- /footer -->
+
+</div>
+<!-- /content area -->
+
+
+<!-- Large modal -->
+<div *ngIf="showUpdateModal" class="modal fade" id="createUserModal">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h5 class="modal-title">Thêm thông tin người dùng</h5>
+			</div>
+			<hr>
+			<form *ngIf="doneSetupForm" [formGroup]="frmUser" (ngSubmit)="OnSubmit(frmUser.value)"
+				class="form-horizontal">
+				<div class="modal-body" style="padding-left: 50px !important; padding-right:50px !important;">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Họ tên<span style="color:red ;">*</span></label>
+						<div class="col-lg-9">
+							<input formControlName="txt_hoten" type="text" class="form-control" placeholder="Họ tên">
+							<div *ngIf="hoten.invalid && (hoten.dirty || hoten.touched)">
+								<div *ngIf="hoten.errors?.['required']" style="color:red ;">Họ tên không được rỗng</div>
+								<div *ngIf="hoten.errors?.['minlength']" style="color:red ;">
+									Họ tên không được nhỏ hơn 3 ký tự
+								</div>
+								<div *ngIf="hoten.errors?.['maxlength']" style="color:red ;">
+									Họ tên không được lớn hơn 250 ký tự
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Ngày sinh<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_ngaysinh" type="date" class="form-control"
+								placeholder="Ngày sinh">
+							<div *ngIf="ngaysinh.invalid && (ngaysinh.dirty || ngaysinh.touched)">
+								<div *ngIf="ngaysinh.errors?.['required']" style="color:red ;">Ngày sinh không được rỗng
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Giới tính<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<label class="radio-inline">
+								<input formControlName="txt_gioitinh" type="radio" class="styled" name="txt_gioitinh"
+									checked="checked" value="Nam">
+								Nam
+							</label>
+
+							<label class="radio-inline">
+								<input formControlName="txt_gioitinh" type="radio" class="styled" name="txt_gioitinh"
+									value="Nữ">
+								Nữ
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Địa chỉ:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_diachi" type="text" class="form-control" placeholder="Địa chỉ">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Email:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_email" type="text" class="form-control" placeholder="Email">
+							<div *ngIf="email.invalid && (email.dirty || email.touched)">
+								<div *ngIf="email.errors?.['email']" style="color:red ;">Không đúng định dạng của email!
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Điện thoại:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_dienthoai" type="text" class="form-control"
+								placeholder="Điện thoại">
+							<div *ngIf="dienthoai.invalid && (dienthoai.dirty || dienthoai.touched)">
+								<div *ngIf="dienthoai.errors?.['pattern']" style="color:red ;">Không đúng định dạng số
+									điện thoại!</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Tài khoản<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_taikhoan" type="text" class="form-control"
+								placeholder="Tài khoản">
+							<div *ngIf="taikhoan.invalid && (taikhoan.dirty || taikhoan.touched)">
+								<div *ngIf="taikhoan.errors?.['required']" style="color:red ;">Tài khoản không được rỗng
+								</div>
+								<div *ngIf="taikhoan.errors?.['minlength']" style="color:red ;">
+									Tài khoản không được nhỏ hơn 5 ký tự
+								</div>
+								<div *ngIf="taikhoan.errors?.['maxlength']" style="color:red ;">
+									Tài khoản không được lớn hơn 50 ký tự
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Mật khẩu<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_matkhau" type="password" class="form-control"
+								placeholder="Mật khẩu">
+							<div *ngIf="matkhau.invalid && (matkhau.dirty || matkhau.touched)">
+								<div *ngIf="matkhau.errors?.['required']" style="color:red ;">Mật khẩu là bắt buộc</div>
+								<div *ngIf="matkhau.errors?.['matkhau']" style="color:red ;"> Độ dài mật khẩu tối thiệu
+									phải là 6 ký tự và
+									phải chứa ký tự đặc biệt @#!$%&*</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Nhập lại mật khẩu<span
+								style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_nhaplai_matkhau" type="password" class="form-control"
+								placeholder="Nhập lại mật khẩu">
+							<div *ngIf="nhaplaimatkhau.invalid && (nhaplaimatkhau.dirty || nhaplaimatkhau.touched)">
+								<div *ngIf="nhaplaimatkhau.errors?.['required']" style="color:red ;">Xác nhận lại mật
+									khẩu là bắt buộc</div>
+								<div *ngIf="nhaplaimatkhau.errors?.['matching']" style="color:red ;">Xác thực lại mật
+									khẩu không đúng</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Loại quyền:</label>
+						<div class="col-lg-9">
+							<select formControlName="txt_loaiquyen" [(ngModel)]="loaiQuyen" class="LoaiQuyen">
+								<option [value]="'Admin'">Admin</option>
+								<option [value]="'User'">User</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Ảnh đại diện:</label>
+						<div class="col-lg-9">
+							<div class="media no-margin-top">
+								<div class="media-left">
+									<a href="#"><img
+											[src]="user && user.anhDaiDien?user.anhDaiDien:'assets/images/placeholder.jpg'"
+											style="width: 58px; height: 58px;" class="img-rounded" alt=""></a>
+								</div>
+
+								<div class="media-body">
+									<input (change)="upload($event)" accept=".jpg,.png,.jpeg,.gif,.bmp,.tif,.tiff"
+										type="file" class="file-styled">
+									<span class="help-block">Accepted formats: gif, png, jpg. Max file size 2Mb</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- <div class="form-group">
+						<label class="col-lg-3 control-label">Thông tin khác:</label>
+						<div class="col-lg-9">
+							<textarea formControlName="txt_thongtinkhac" rows="5" cols="5" class="form-control"
+								placeholder="Nhập thông tin khác tại đây"></textarea>
+						</div>
+					</div> -->
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Thông tin khác:</label>
+						<div class="col-lg-9">
+							<!-- <ckeditor formControlName="txt_thongtinkhac" [config]="ckeConfig"></ckeditor> -->
+						</div>
+					</div>
+
+				</div>
+				<hr>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" (click)="closeModal()">Đóng</button>
+					<button type="submit" class="btn btn-primary" [disabled]="frmUser.invalid">Lưu lại</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!-- /large modal -->
