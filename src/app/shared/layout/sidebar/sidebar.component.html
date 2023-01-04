@@ -9,9 +9,9 @@
               <a href="#" class="media-left"><img src="assets/images/placeholder.jpg" class="img-circle img-sm"
                       alt=""></a>
               <div class="media-body">
-                  <span class="media-heading text-semibold">Victoria Baker</span>
+                  <span class="media-heading text-semibold">{{user.name}}</span>
                   <div class="text-size-mini text-muted">
-                      <i class="icon-pin text-size-small"></i> &nbsp;Santa Ana, CA
+                      <i class="icon-pin text-size-small"></i> &nbsp;{{user.address}}
                   </div>
               </div>
 
@@ -34,23 +34,24 @@
           <ul class="navigation navigation-main navigation-accordion">
 
               <!-- Main -->
-              <li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i></li>
+              <li class="navigation-header"><span></span> <i class="icon-menu" title="Main pages"></i></li>
               <li class="active"><a [routerLink]="['']"><i class="icon-home4"></i> <span>Trang chủ</span></a></li>
               <li>
-                  <a ><i class="icon-stack2"></i> <span>Quản lý</span></a>
+                  <a ><i class="icon-pencil7"></i> <span>Quản lý</span></a>
                   <ul>
                       <li><a [routerLink]="['/manage/product']">Quản lý sản phẩm</a></li>
+                      <li><a [routerLink]="['/manage/category']">Quản lý loại</a></li>
                   </ul>
               </li>
               <li>
-                <a><i class="icon-stack2"></i> <span>Quản lý hóa đơn</span></a>
+                <a><i class="icon-pencil7"></i> <span>Quản lý hóa đơn</span></a>
                 <ul>
                     <li><a [routerLink]="['/invoice/sell']">Bán hàng</a></li>
                     <li><a [routerLink]="['/invoice/order']">Quản lý đơn hàng</a></li>
                 </ul>
             </li>
               <li *ngIf="user.role == 'Admin'">
-                <a><i class="icon-stack2"></i> <span>Quản lý người dùng</span></a>
+                <a><i class="icon-pencil7"></i> <span>Quản lý người dùng</span></a>
                 <ul>
                     <li><a [routerLink]="['/user/manage-user']">Danh sách người dùng</a></li>
                     <li><a [routerLink]="['/user/info-user']">Thông tin người dùng</a></li>

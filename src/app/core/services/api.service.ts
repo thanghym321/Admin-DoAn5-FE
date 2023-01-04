@@ -13,6 +13,21 @@ export class ApiService {
     constructor(private _http: HttpClient, public router: Router, private authenticationService: AuthenticationService) {
 
     }
+
+    public get(url: string) {
+      let cloneHeader: any = {};
+      cloneHeader['Content-Type'] = 'application/json';
+      const headerOptions = new HttpHeaders(cloneHeader);
+      return this._http
+          .get(this.host + url, { headers: headerOptions })
+          .pipe(
+              map((res: any) => {
+                  return res;
+              })
+          );
+
+    }
+
     public post(url: string, obj: any) {
         const body = JSON.stringify(obj);
         let cloneHeader: any = {};
@@ -27,18 +42,18 @@ export class ApiService {
             );
     }
 
-    public get(url: string) {
-        let cloneHeader: any = {};
-        cloneHeader['Content-Type'] = 'application/json';
-        const headerOptions = new HttpHeaders(cloneHeader);
-        return this._http
-            .get(this.host + url, { headers: headerOptions })
-            .pipe(
-                map((res: any) => {
-                    return res;
-                })
-            );
-
+    public put(url: string, obj: any) {
+      const body = JSON.stringify(obj);
+      let cloneHeader: any = {};
+      cloneHeader['Content-Type'] = 'application/json';
+      const headerOptions = new HttpHeaders(cloneHeader);
+      return this._http
+          .put<any>(this.host + url, body, { headers: headerOptions })
+          .pipe(
+              map((res: any) => {
+                  return res;
+              })
+          );
     }
 
     public delete(url: string, id: any) {
@@ -54,6 +69,7 @@ export class ApiService {
             );
     }
     public uploadFileSingle(url: string, folder: string, file: Blob) {
+      debugger;
         const formData = new FormData();
         formData.append('file', file);
         formData.append('folder', folder);
