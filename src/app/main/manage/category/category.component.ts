@@ -4,11 +4,11 @@ import { BaseComponent } from 'src/app/core/common/base-component';
 declare var $: any;
 
 @Component({
-  selector: 'app-product',
-  templateUrl: './product.component.html',
-  styleUrls: ['./product.component.css']
+  selector: 'app-category',
+  templateUrl: './category.component.html',
+  styleUrls: ['./category.component.css']
 })
-export class ProductComponent extends BaseComponent implements OnInit,AfterViewInit {
+export class CategoryComponent extends BaseComponent implements OnInit,AfterViewInit {
 
   //list
   list_category: any;
@@ -264,4 +264,5 @@ export class ProductComponent extends BaseComponent implements OnInit,AfterViewI
     }
 
   }
+
 }

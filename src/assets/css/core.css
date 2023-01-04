@@ -3245,7 +3245,7 @@ li + .dropdown-header.highlight,
   }
 }
 .navbar-header {
-  min-width: 260px;
+  min-width: 193px;
 }
 .navbar-collapse > .navbar-header {
   margin-left: 0;
