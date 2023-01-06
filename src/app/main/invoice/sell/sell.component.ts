@@ -10,29 +10,38 @@ import { BaseComponent } from '../../../core/common/base-component';
   styleUrls: ['./sell.component.css']
 })
 export class SellComponent extends BaseComponent implements OnInit {
-  public list_item: any;
+
+  public list_product: any;
   public list_order: any = [];
-  public tong: number;
+  public total: number;
   public frmHoaDon: FormGroup;
+
   constructor(injector: Injector, private authenticationService: AuthenticationService) {
     super(injector);
     this.frmHoaDon = new FormGroup({
-      'txt_hoten': new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(250)]),
-      'txt_dienthoai': new FormControl('', [Validators.pattern("^((\\+91-?)|0)?[0-9]{10}$")]),
-      'txt_tinkhac': new FormControl('', []),
+      'txt_name': new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(250)]),
+      'txt_address': new FormControl('', [Validators.required]),
+      'txt_phone': new FormControl('', [Validators.pattern("^((\\+91-?)|0)?[0-9]{10}$")]),
+      'txt_email': new FormControl('', [Validators.email]),
     });
   }
 
-  get dienthoai() {
-    return this.frmHoaDon.get('txt_dienthoai')!;
+  get name() {
+    return this.frmHoaDon.get('txt_name')!;
   }
-  get hoten() {
-    return this.frmHoaDon.get('txt_hoten')!;
+  get address() {
+    return this.frmHoaDon.get('txt_address')!;
+  }
+  get phone() {
+    return this.frmHoaDon.get('txt_phone')!;
+  }
+  get email() {
+    return this.frmHoaDon.get('txt_email')!;
   }
 
   ngOnInit(): void {
-    this._api.post('/api/sell/search', { page: 1, pageSize: 10 }).subscribe(res => {
-      this.list_item = res.data;
+    this._api.get('/api/Products/get').subscribe(res => {
+      this.list_product = res;
       setTimeout(() => {
         this.loadScripts('assets/js/core/app.js');
       });
@@ -44,24 +53,27 @@ export class SellComponent extends BaseComponent implements OnInit {
     if (this.frmHoaDon.invalid) {
       return;
     }
-    let user = this.authenticationService.userValue;
+    // let user = this.authenticationService.userValue;
     let obj: any = {};
-    obj.khachhang = {
-      TenKhachHang: vl.txt_hoten,
-      SoDienThoai: vl.txt_dienthoai
+    obj.customer = {
+      Name: vl.txt_name,
+      Address: vl.txt_name,
+      Phone: vl.txt_phone,
+      Email: vl.txt_email,
     }
-    obj.hoadon = {
-      MaNguoiDung: user.user_Id
-    }
-    obj.chitiethoadon = [];
+    // obj.hoadon = {
+    //   MaNguoiDung: user.user_Id
+    // }
+    obj.list_detail = [];
     this.list_order.forEach((x: any) => {
-      obj.chitiethoadon.push({
-        MaSanPham: x.maSanPham,
-        SoLuong: x.soLuong,
-        GiaBan: x.gia
+      obj.list_detail.push({
+        Product_Id: x.id,
+        Quantity: x.quantity,
+        Price: x.price
       });
     });
-    this._api.post('/api/sell/create-hoadonxuat', obj).subscribe(res => {
+    debugger;
+    this._api.post('/api/Export_Invoices/create', obj).subscribe(res => {
       if (res && res.data) {
         alert('Thêm dữ liệu thành công')
       } else {
@@ -69,35 +81,36 @@ export class SellComponent extends BaseComponent implements OnInit {
       }
     });
   }
-  public delete(maSanPham: any) {
-    this.list_order = this.list_order.filter((x: any) => x.maSanPham != maSanPham);
-    this.tong = this.list_order.reduce((sum: any, x: any) => sum + x.gia * x.soLuong, 0);
+  public delete(id: any) {
+    this.list_order = this.list_order.filter((x: any) => x.id != id);
+    this.total = this.list_order.reduce((sum: any, x: any) => sum + x.price * x.quantity, 0);
   }
 
 
 
   public Add(item: any) {
     if (this.list_order.length == 0) {
-      item.soLuong = 1;
+      item.quantity = 1;
       this.list_order = [item];
     } else {
       let ok = true;
       for (let x of this.list_order) {
-        if (x.maSanPham == item.maSanPham) {
-          x.soLuong += 1;
+        if (x.id == item.id) {
+          x.quantity += 1;
           ok = false;
           break;
         }
       }
       if (ok) {
-        item.soLuong = 1;
+        item.quantity = 1;
         this.list_order.push(item);
       }
     }
-    this.tong = this.list_order.reduce((sum: any, x: any) => sum + x.gia * x.soLuong, 0);
+    console.log(this.list_order);
+    this.total = this.list_order.reduce((sum: any, x: any) => sum + x.price * x.quantity, 0);
   }
   public TinhToan() {
-    this.tong = this.list_order.reduce((sum: any, x: any) => sum + x.gia * x.soLuong, 0);
+    this.total = this.list_order.reduce((sum: any, x: any) => sum + x.price * x.quantity, 0);
   }
 
   public printHtml() {
@@ -106,10 +119,10 @@ export class SellComponent extends BaseComponent implements OnInit {
       html_order += `
       <tr>
       <td>1</td>
-      <td>${x.tenSanPham}</td>
-      <td>${x.gia}</td>
-      <td>${x.soLuong}</td>
-      <td>${x.gia * x.soLuong}</td>
+      <td>${x.name}</td>
+      <td>${x.price}</td>
+      <td>${x.quantity}</td>
+      <td>${x.price * x.quantity}</td>
       </tr>
       `;
     });
@@ -129,15 +142,15 @@ export class SellComponent extends BaseComponent implements OnInit {
         </div>
     </section>
 
-    <div class="le dam">Tên đơn vị bán hàng: Nguyễn Chiến Computer</div>
+    <div class="le dam">Tên đơn vị bán hàng: AnhThawngs Computer</div>
     <div class="le">Mã số thuế: 3269289058</div>
-    <div class="le">Địa chỉ: 195 Nguyễn Chế Nghĩa, Gia Lộc, Hải Dương</div>
-    <div class="le doi">Điện thoại: 0948.098.195</div>
+    <div class="le">Địa chỉ: Thị trấn Yên Mỹ, Yên Mỹ, Hưng Yên</div>
+    <div class="le doi">Điện thoại: 0379.114.366</div>
     <div class="le doi">Số tài khoản: 762618652671614</div>
-    <div class="le dam">Người mua hàng: ${this.frmHoaDon.value['txt_hoten']}</div>
-    <div class="le">Email: abc@mail.com</div>
-    <div class="le">Điện thoại: 0987654321</div>
-    <div class="le">Địa chỉ: Hải Dương</div>
+    <div class="le dam">Người mua hàng: ${this.frmHoaDon.value['txt_name']}</div>
+    <div class="le">Email: ${this.frmHoaDon.value['txt_email']}</div>
+    <div class="le">Điện thoại: ${this.frmHoaDon.value['txt_phone']}</div>
+    <div class="le">Địa chỉ: ${this.frmHoaDon.value['txt_address']}</div>
     <div class="le doi">Hình thức thanh toán: Tiền mặt / Chuyển khoản</div>
     <div class="le doi">Số tài khoản: 526716147626186</div>
     <div class="le">Ghi chú: </div>

@@ -1,106 +1,158 @@
 <!-- Page header -->
 <div class="page-header page-header-default">
-    <div class="page-header-content">
-        <div class="page-title">
-            <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Datatables</span> - Basic</h4>
-        </div>
+	<div class="page-header-content">
+		<div class="page-title">
+			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Quản lý</span> - Quản lý
+				đơn hàng</h4>
+		</div>
+<!--
+		<div class="heading-elements">
+			<div class="heading-btn-group">
+				<a (click)="createModal()" class="btn btn-link btn-float has-text"><i
+						class="icon-plus22 text-primary"></i><span>Thêm</span></a>
+			</div>
+		</div>
+	</div> -->
 
-        <div class="heading-elements">
-            <div class="heading-btn-group">
-                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
-                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
-                <a href="#" class="btn btn-link btn-float has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
-            </div>
-        </div>
-    </div>
-
-    <div class="breadcrumb-line">
-        <ul class="breadcrumb">
-            <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
-            <li><a href="datatable_basic.html">Datatables</a></li>
-            <li class="active">Basic</li>
-        </ul>
-
-        <ul class="breadcrumb-elements">
-            <li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <i class="icon-gear position-left"></i>
-                    Settings
-                    <span class="caret"></span>
-                </a>
-
-                <ul class="dropdown-menu dropdown-menu-right">
-                    <li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
-                    <li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
-                    <li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#"><i class="icon-gear"></i> All settings</a></li>
-                </ul>
-            </li>
-        </ul>
-    </div>
+	<div class="breadcrumb-line">
+		<ul class="breadcrumb">
+			<li><a [routerLink]="['']"><i class="icon-home2 position-left"></i> Trang chủ</a></li>
+			<li>Quản lý</li>
+			<li class="active">Quản lý đơn hàng</li>
+		</ul>
+	</div>
 </div>
 <!-- /page header -->
 <!-- Content area -->
 <div class="content">
+	<div class="row">
+		<div class="col-md-12">
 
-    <!-- Basic datatable -->
-    <div class="panel panel-flat">
-        <div class="panel-heading">
-            <h5 class="panel-title">Basic datatable</h5>
-            <div class="heading-elements">
-                <ul class="icons-list">
-                    <li><a data-action="collapse"></a></li>
-                    <li><a data-action="reload"></a></li>
-                    <li><a data-action="close"></a></li>
-                </ul>
-            </div>
+			<!-- Basic layout-->
+			<form [formGroup]="frmSearch" class="form-horizontal" (ngSubmit)="loadExport_Invoice()" >
+				<div class="panel panel-flat">
+					<div class="panel-heading">
+						<h5 class="panel-title">Tìm kiếm</h5>
+					</div>
+
+					<div class="panel-body">
+						<div class="form-group">
+							<label class="col-lg-5 control-label" style="text-align:right ;">Tên khách hàng:</label>
+							<div class="col-lg-4">
+								<input formControlName="txt_name" type="text" class="form-control" placeholder="Tên khách hàng">
+							</div>
+						</div>
+						<div class="col-lg-10 text-right">
+							<button type="submit" class="btn btn-primary"><i class="icon-search4 position-right"></i> Tìm kiếm</button>
+						</div>
+					</div>
+				</div>
+			</form>
+			<!-- /basic layout -->
+		</div>
+	</div>
+
+
+	<!-- Basic datatable -->
+	<div class="panel panel-flat">
+		<div class="panel-heading">
+      <div class="row">
+        <div class="col-lg-11">
+          <h5 class="panel-title">DANH SÁCH THÔNG TIN ĐƠN HÀNG</h5>
         </div>
-
-        <div class="panel-body">
-            The <code>DataTables</code> is a highly flexible tool, based upon the foundations of progressive enhancement, and will add advanced interaction controls to any HTML table. DataTables has most features enabled by default, so all you need to do to use it with your own tables is to call the construction function. Searching, ordering, paging etc goodness will be immediately added to the table, as shown in this example. <strong>Datatables support all available table styling.</strong>
+        <div class="col-lg-1">
+          <select class="form-control" (ngModelChange)="loadPageSize($event)" [(ngModel)]="pageSize">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
         </div>
+      </div>
+		</div>
 
-        <table class="table datatable-basic">
-            <thead>
-                <tr>
-                    <th>Mã sản phẩm</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Họ tên khách hàng</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let it of list_item">
-                    <td>{{it.maSanPham}}</td>
-                    <td>{{it.tenSanPham}}</td>
-                    <td>{{it.tenKhachHang}}</td>
-                    <td class="text-center">
-                        <ul class="icons-list">
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <i class="icon-menu9"></i>
-                                </a>
-
-                                <ul class="dropdown-menu dropdown-menu-right">
-                                    <li><a href="#"><i class="icon-file-pdf"></i> Export to .pdf</a></li>
-                                    <li><a href="#"><i class="icon-file-excel"></i> Export to .csv</a></li>
-                                    <li><a href="#"><i class="icon-file-word"></i> Export to .doc</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+		<table class="table datatable-basic">
+			<thead>
+				<tr>
+					<th width="50px;">STT</th>
+					<th>Tên khách hàng</th>
+					<th>Địa chỉ</th>
+					<th>Số điện thoại</th>
+					<th>Email</th>
+					<th>Ngày xuất</th>
+					<th>Trạng thái</th>
+					<th>Chi tiết</th>
+					<th class="text-center">Hành động</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let lei of list_export_invoice | paginate: {itemsPerPage: pageSize, currentPage: pageIndex, totalItems: totalProduct}; let i = index">
+					<td>{{ pageSize * (pageIndex - 1) + (i + 1)}}</td>
+					<td>{{lei.name}}</td>
+					<td>{{lei.address}}</td>
+					<td>{{lei.phone}}</td>
+					<td>{{lei.email}}</td>
+					<td>{{lei.export_Date | date : "hh:mm:ss, dd-MM-yyyy"}}</td>
+          <td>
+            <span *ngIf="lei.status==0" class="label label-success">Đã đặt</span>
+            <span *ngIf="lei.status==1" class="label label-success">Đã hủy</span>
+          </td>
+          <td>
+            <ul class="icons-list">
+							<li><a (click)="openUpdateModal(lei.id)"><i class="btn btn-primary">Chi tiết</i></a></li>
+						</ul>
+          </td>
+					<td class="text-center">
+						<ul class="icons-list">
+							<li><a (click)="onRemove(lei.id)"><i class="icon-trash"></i></a></li>
+						</ul>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+    <div style="text-align: right;">
+      <pagination-controls previousLabel="Prev" nextLabel="Next" (pageChange)="loadPageIndex($event)">
+      </pagination-controls>
     </div>
-    <!-- /basic datatable -->
-    <!-- Footer -->
-    <div class="footer text-muted">
-        &copy; 2015. <a href="#">Limitless Web App Kit</a> by <a href="http://themeforest.net/user/Kopyov" target="_blank">Eugene Kopyov</a>
-    </div>
-    <!-- /footer -->
+	</div>
+	<!-- /basic datatable -->
 
 </div>
 <!-- /content area -->
+
+<!-- Large modal -->
+<div *ngIf="showUpdateModal" class="modal fade" id="createModal">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h5 class="modal-title">Thông tin Chi tiết</h5>
+			</div>
+			<hr>
+			<div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Ảnh</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let lo of export_Invoice let i = index">
+                    <td >{{i+1}}</td>
+                    <td ><img src="{{lo.image}}" height="100%;" width="100px" alt=""></td>
+                    <td >{{lo.name}}</td>
+                    <td >{{lo.price | currency :'VND'}}</td>
+                    <td >{{lo.quantity}}</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+		</div>
+	</div>
+</div>
+<!-- /large modal -->

@@ -5,12 +5,15 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { OrderComponent } from './order/order.component';
 import { SellComponent } from './sell/sell.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxPaginationModule } from 'ngx-pagination';
+
+
 @NgModule({
   declarations: [OrderComponent, SellComponent ],
   imports: [
     CommonModule,
     SharedModule,
-    FormsModule,ReactiveFormsModule,
+    FormsModule,ReactiveFormsModule,NgxPaginationModule,
     RouterModule.forChild([
       {
         path: 'order',

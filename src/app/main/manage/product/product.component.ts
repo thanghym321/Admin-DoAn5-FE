@@ -79,6 +79,7 @@ export class ProductComponent extends BaseComponent implements OnInit,AfterViewI
     ).subscribe(res => {
       this.list_product = res.items;
       this.totalProduct=res.totalItem;
+      console.log(this.list_product)
     });
   }
 
@@ -119,13 +120,12 @@ export class ProductComponent extends BaseComponent implements OnInit,AfterViewI
     this.showUpdateModal = true;
     this.isCreate = true;
     setTimeout(() => {
-      $('#createProductModal').modal('toggle');
+      $('#createModal').modal('toggle');
       this.doneSetupForm = true;
       this.frmProduct = new FormGroup({
         'txt_category_Id': new FormControl('',[Validators.required]),
         'txt_name': new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(250)]),
         'txt_description': new FormControl('', [Validators.minLength(3)]),
-        'txt_image': new FormControl(''),
         'txt_producer_Id': new FormControl('',[Validators.required]),
         'txt_price': new FormControl('',[Validators.required]),
         'txt_unit_Id': new FormControl('',[Validators.required]),
@@ -140,16 +140,14 @@ export class ProductComponent extends BaseComponent implements OnInit,AfterViewI
     this.doneSetupForm = false;
     this.isCreate = false;
     setTimeout(() => {
-      $('#createProductModal').modal('toggle');
+      $('#createModal').modal('toggle');
       this._api.get('/api/Products/getbyid/' + id).subscribe(res => {
-        debugger;
         this.product = res;
         this.doneSetupForm = true;
         this.frmProduct = new FormGroup({
           'txt_category_Id': new FormControl(this.product.category_Id,[Validators.required]),
           'txt_name': new FormControl(this.product.name, [Validators.required, Validators.minLength(3), Validators.maxLength(250)]),
           'txt_description': new FormControl(this.product.description, [Validators.minLength(3)]),
-          'txt_image': new FormControl(this.product.image),
           'txt_producer_Id': new FormControl(this.product.producer_Id,[Validators.required]),
           'txt_price': new FormControl(this.product.price,[Validators.required]),
           'txt_unit_Id': new FormControl(this.product.unit_Id,[Validators.required]),
@@ -168,7 +166,7 @@ export class ProductComponent extends BaseComponent implements OnInit,AfterViewI
   }
 
   public closeModal() {
-    $('#createProductModal').closest('.modal').modal('hide');
+    $('#createModal').closest('.modal').modal('hide');
   }
 
   public upload(event: any) {
@@ -210,7 +208,7 @@ export class ProductComponent extends BaseComponent implements OnInit,AfterViewI
       if (this.file) {
         this._api.uploadFileSingle('/api/upload/upload-single', 'product', this.file).subscribe((res: any) => {
           if (res && res.body && res.body.filePath) {
-            product.image = res.body.filePath;
+            product.Image = res.body.filePath;
             this._api.post('/api/Products/create', product).subscribe(res => {
               if (res && res.data) {
                 alert('Thêm dữ liệu thành công');
@@ -234,11 +232,12 @@ export class ProductComponent extends BaseComponent implements OnInit,AfterViewI
         });
       }
     } else {
+      debugger;
       product.id = this.product.id;
       if (this.file) {
         this._api.uploadFileSingle('/api/upload/upload-single', 'product', this.file).subscribe((res: any) => {
           if (res && res.body && res.body.filePath) {
-            product.image = res.body.filePath;
+            product.Image = res.body.filePath;
             this._api.put('/api/Products/update', product).subscribe(res => {
               if (res && res.data) {
                 alert('Cập nhật dữ liệu thành công');

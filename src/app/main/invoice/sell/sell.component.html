@@ -28,13 +28,14 @@
                  <div class="panel panel-flat">
                     <div class="panel-heading" >
                         <h5 class="panel-title">Thông tin đơn hàng</h5>
-                        <h5 style="position: absolute ; top: 20px !important;; right:20px ; color: red ;" class="panel-title">Tổng giá trị hóa đơn: {{tong}} VND</h5>
+                        <h5 style="position: absolute ; top: 20px !important;; right:20px ; color: red ;" class="panel-title">Tổng giá trị hóa đơn: {{total | currency :'VND'}}</h5>
                     </div>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>STT</th>
+                                    <th>Ảnh</th>
                                     <th>Tên sản phẩm</th>
                                     <th>Đơn giá</th>
                                     <th>Số lượng</th>
@@ -42,14 +43,17 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let it of list_order">
-                                    <td>1</td>
-                                    <td>{{it.tenSanPham}}</td>
-                                    <td>{{it.gia}} VNĐ</td>
-                                    <td><input style="width:100px ;" type="number" class="form-control" value="{{it.soLuong}}" [(ngModel)] = "it.soLuong" (ngModelChange)="TinhToan()"></td>
-                                    <td><a (click)="delete(it.maSanPham)" class="label label-flat label-rounded label-icon border-teal text-teal-600" style="cursor: pointer ;" ><i class="icon-x"></i></a> </td>
+                                <tr *ngFor="let lo of list_order let i = index">
+                                    <td>{{i+1}}</td>
+                                    <div class="product-item">
+                                      <img src="http://localhost:8888/{{lo.image}}" alt="Product" height="100%;" width="100px;">
+                                    </div>
+                                    <td>{{lo.name}}</td>
+                                    <td>{{lo.price | currency :'VND'}}</td>
+                                    <td><input style="width:100px ;" type="number" class="form-control" value="{{lo.quantity}}" [(ngModel)] = "lo.quantity" (ngModelChange)="TinhToan()"></td>
+                                    <td><a (click)="delete(lo.id)" class="label label-flat label-rounded label-icon border-teal text-teal-600" style="cursor: pointer ;" ><i class="icon-x"></i></a> </td>
                                 </tr>
-                                
+
                             </tbody>
                         </table>
                     </div>
@@ -64,20 +68,20 @@
                     <div class="panel-body">
                        	<!-- Grid -->
 							<div class="row">
-								<div class="col-lg-3 col-sm-6" *ngFor = "let it of list_item" >
+								<div class="col-lg-3 col-sm-6" *ngFor = "let lp of list_product" >
 									<div class="panel">
 										<div class="panel-body">
 											<div class="thumb thumb-fixed">
-												<a data-popup="lightbox" (click)="Add(it)">
-													<img src="{{it.anhDaiDien}}" alt="">
+												<a data-popup="lightbox" (click)="Add(lp)">
+													<img src="{{lp.image}}" alt="">
 													<span class="zoom-image"><i class="icon-plus2"></i></span>
 												</a>
 											</div>
 										</div>
 
-										<div class="panel-body panel-body-accent text-center">
-											<h6 class="text-semibold no-margin"><a href="#" class="text-default">{{it.tenSanPham}}</a></h6>
-											<h3 class="no-margin text-semibold">{{it.gia}}VNĐ</h3>
+										<div class="panel-body panel-body-accent text-center" style="height: 120px; padding-top: 15px;">
+											<h6 class="text-semibold no-margin"><a class="text-default">{{lp.name}}</a></h6>
+											<h3 class="no-margin text-semibold">{{lp.price | currency :'VND'}}</h3>
 										</div>
 									</div>
 								</div>
@@ -125,39 +129,47 @@
                         <form [formGroup] = "frmHoaDon" (ngSubmit)="ThanhToan(frmHoaDon.value)"  class="category-content">
                             <div class="form-group">
                                 <label>Tên khách(<span style="color:red ;" >*</span>):</label>
-                                <input formControlName="txt_hoten" type="text" class="form-control" placeholder="Tên khách">
-                                <div *ngIf="hoten.invalid && (hoten.dirty || hoten.touched)">
-                                    <div *ngIf="hoten.errors?.['required']" style="color:red ;">Họ tên không được rỗng</div>
-                                    <div *ngIf="hoten.errors?.['minlength']" style="color:red ;">
+                                <input formControlName="txt_name" type="text" class="form-control" placeholder="Tên khách">
+                                <div *ngIf="name.invalid && (name.dirty || name.touched)">
+                                    <div *ngIf="name.errors?.['required']" style="color:red ;">Họ tên không được rỗng</div>
+                                    <div *ngIf="name.errors?.['minlength']" style="color:red ;">
                                         Họ tên không được nhỏ hơn 3 ký tự
                                     </div>
-                                    <div *ngIf="hoten.errors?.['maxlength']" style="color:red ;">
+                                    <div *ngIf="name.errors?.['maxlength']" style="color:red ;">
                                         Họ tên không được lớn hơn 250 ký tự
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Điện thoại:</label>
-                                <input formControlName="txt_dienthoai" type="text" class="form-control" placeholder="Điện thoại">
-                                <div *ngIf="dienthoai.invalid && (dienthoai.dirty || dienthoai.touched)">
-                                    <div *ngIf="dienthoai.errors?.['pattern']" style="color:red ;">Không đúng định dạng số
+                              <label>Địa chỉ(<span style="color:red ;" >*</span>):</label>
+                              <input formControlName="txt_address" type="text" class="form-control" placeholder="Địa chỉ">
+                              <div *ngIf="address.invalid && (address.dirty || address.touched)">
+                                  <div *ngIf="address.errors?.['required']" style="color:red ;">Địa chỉ không được rỗng</div>
+                              </div>
+                          </div>
+                            <div class="form-group">
+                                <label>Điện thoại(<span style="color:red ;" >*</span>):</label>
+                                <input formControlName="txt_phone" type="text" class="form-control" placeholder="Điện thoại">
+                                <div *ngIf="phone.invalid && (phone.dirty || phone.touched)">
+                                    <div *ngIf="phone.errors?.['pattern']" style="color:red ;">Không đúng định dạng số
                                         điện thoại!</div>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="form-group">
-                                <label>Thông tin khác:</label>
-                                <textarea formControlName="txt_tinkhac"  rows="3" cols="3" class="form-control"
-                                    placeholder="Thông tin khác"></textarea>
+                                <label>Email(<span style="color:red ;" >*</span>): </label>
+                                <input formControlName="txt_email" type="text"  class="form-control"  placeholder="Email">
+                                <div *ngIf="email.invalid && (email.dirty || email.touched)">
+                                  <div *ngIf="email.errors?.['email']" style="color:red ;">Không đúng định dạng của email</div>
+                              </div>
                             </div>
-
                             <div class="row">
-                                <div class="col-xs-6">
-                                    <button type="reset" class="btn btn-info btn-block"  (click)="printHtml()"  >In</button>
-                                </div>
-                                <div class="col-xs-6">
-                                    <button [disabled]="frmHoaDon.invalid || list_order.length == 0" type="submit" class="btn btn-info btn-block">Thanh toán</button>
-                                </div>
-                            </div>
+                              <div class="col-xs-6">
+                                  <button type="reset" class="btn btn-info btn-block"  (click)="printHtml()"  >In</button>
+                              </div>
+                              <div class="col-xs-6">
+                                  <button [disabled]="frmHoaDon.invalid || list_order.length == 0" type="submit" class="btn btn-info btn-block">Thanh toán</button>
+                              </div>
+                          </div>
                         </form>
                     </div>
                     <!-- /form sample -->

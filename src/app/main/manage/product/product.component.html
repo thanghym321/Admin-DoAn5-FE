@@ -61,7 +61,7 @@
 
 
 	<!-- Basic datatable -->
-	<div class="panel panel-flat">
+	<div class="panel panel-flat"  style="overflow-x: auto;">
 		<div class="panel-heading">
       <div class="row">
         <div class="col-lg-11">
@@ -108,7 +108,7 @@
             <span *ngIf="lp.status==0" class="label label-success">Không kích hoạt</span>
             <span *ngIf="lp.status==1" class="label label-success">Kích Hoạt</span>
           </td>
-					<td>{{lp.date_Created | date : "hh:mm:ss, dd:MM:yyyy"}}</td>
+					<td>{{lp.date_Created | date : "hh:mm:ss, dd-MM-yyyy"}}</td>
 					<td class="text-center">
 						<ul class="icons-list">
 							<li><a (click)="openUpdateModal(lp.id)"><i class="icon-pencil7"></i></a></li>
@@ -129,7 +129,7 @@
 <!-- /content area -->
 
 <!-- Large modal -->
-<div *ngIf="showUpdateModal" class="modal fade" id="createProductModal">
+<div *ngIf="showUpdateModal" class="modal fade" id="createModal">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -186,7 +186,7 @@
 									<img  src="{{imagePreview}}" style="width: 58px; height: 58px;" class="img-rounded" alt="">
 								</div>
 								<div class="media-body">
-									<input formControlName="txt_image" (change)="upload($event)" accept=".jpg,.png,.jpeg,.gif,.bmp,.tif,.tiff"
+									<input (change)="upload($event)" accept=".jpg,.png,.jpeg,.gif,.bmp,.tif,.tiff"
 										type="file" class="file-styled">
 									<span class="help-block">Định dạng được chấp nhận: gif, png, jpg. Kích thước tệp tối đa 2Mb</span>
 								</div>

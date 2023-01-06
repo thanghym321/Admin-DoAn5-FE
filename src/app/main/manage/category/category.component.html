@@ -3,13 +3,13 @@
 	<div class="page-header-content">
 		<div class="page-title">
 			<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Quản lý</span> - Quản lý
-				sản phẩm</h4>
+				loại</h4>
 		</div>
 
 		<div class="heading-elements">
 			<div class="heading-btn-group">
 				<a (click)="createModal()" class="btn btn-link btn-float has-text"><i
-						class="icon-plus22 text-primary"></i><span>Thêm sản phẩm</span></a>
+						class="icon-plus22 text-primary"></i><span>Thêm loại</span></a>
 			</div>
 		</div>
 	</div>
@@ -18,7 +18,7 @@
 		<ul class="breadcrumb">
 			<li><a [routerLink]="['']"><i class="icon-home2 position-left"></i> Trang chủ</a></li>
 			<li>Quản lý</li>
-			<li class="active">Quản lý sản phẩm</li>
+			<li class="active">Quản lý loại</li>
 		</ul>
 	</div>
 </div>
@@ -29,7 +29,7 @@
 		<div class="col-md-12">
 
 			<!-- Basic layout-->
-			<form [formGroup]="frmSearch" class="form-horizontal" (ngSubmit)="loadProduct()" >
+			<form [formGroup]="frmSearch" class="form-horizontal" (ngSubmit)="loadCategory()" >
 				<div class="panel panel-flat">
 					<div class="panel-heading">
 						<h5 class="panel-title">Tìm kiếm</h5>
@@ -37,16 +37,9 @@
 
 					<div class="panel-body">
 						<div class="form-group">
-							<label class="col-lg-2 control-label" style="text-align:right ;">Tên sản phẩm:</label>
-							<div class="col-lg-3">
-								<input formControlName="txt_name" type="text" class="form-control" placeholder="Tên sản phẩm">
-							</div>
-							<label class="col-lg-2 control-label" style="text-align:right ;">Loại:</label>
-							<div class="col-lg-3">
-								<select formControlName="txt_category_Id" class="form-control">
-									<option  value="">Tất cả</option>
-									<option *ngFor="let lc of list_category" value="{{lc.id}}">{{lc.name}}</option>
-								</select>
+							<label class="col-lg-4 control-label" style="text-align:right ;">Tên loại:</label>
+							<div class="col-lg-4">
+								<input formControlName="txt_name" type="text" class="form-control" placeholder="Tên Loại">
 							</div>
 						</div>
 						<div class="col-lg-10 text-right">
@@ -65,7 +58,7 @@
 		<div class="panel-heading">
       <div class="row">
         <div class="col-lg-11">
-          <h5 class="panel-title">DANH SÁCH THÔNG TIN SẢN PHẨM</h5>
+          <h5 class="panel-title">DANH SÁCH THÔNG TIN LOẠI</h5>
         </div>
         <div class="col-lg-1">
           <select class="form-control" (ngModelChange)="loadPageSize($event)" [(ngModel)]="pageSize">
@@ -82,37 +75,27 @@
 			<thead>
 				<tr>
 					<th width="50px;">STT</th>
-					<th>Loại</th>
-					<th>Tên sản phẩm</th>
-					<th>Mô tả</th>
-					<th>Ảnh</th>
-					<th>Nhà sản xuất</th>
-					<th>Đơn giá</th>
-					<th>Đơn vị tính</th>
+					<th>Tên loại</th>
 					<th>Trạng thái</th>
-					<th>Ngày tạo</th>
+					<th>Ảnh</th>
+					<th>Loại cha</th>
 					<th class="text-center">Hành động</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr *ngFor="let lp of list_product | paginate: {itemsPerPage: pageSize, currentPage: pageIndex, totalItems: totalProduct}; let i = index">
+				<tr *ngFor="let lc of list_category | paginate: {itemsPerPage: pageSize, currentPage: pageIndex, totalItems: totalCategory}; let i = index">
 					<td>{{ pageSize * (pageIndex - 1) + (i + 1)}}</td>
-					<td>{{lp.category_Name}}</td>
-					<td>{{lp.name}}</td>
-					<td>{{lp.description}}</td>
-					<td><img src="{{lp.image}}" height="100%;" width="100px" alt=""></td>
-					<td>{{lp.producer_Name}}</td>
-					<td>{{lp.price | currency: 'VND'}}</td>
-					<td>{{lp.unit_Name}}</td>
-					<td>
-            <span *ngIf="lp.status==0" class="label label-success">Không kích hoạt</span>
-            <span *ngIf="lp.status==1" class="label label-success">Kích Hoạt</span>
+					<td>{{lc.name}}</td>
+          <td>
+            <span *ngIf="lc.status==0" class="label label-success">Không kích hoạt</span>
+            <span *ngIf="lc.status==1" class="label label-success">Kích Hoạt</span>
           </td>
-					<td>{{lp.date_Created | date : "hh:mm:ss, dd:MM:yyyy"}}</td>
+					<td><img src="{{lc.image}}" height="100%;" width="100px" alt=""></td>
+					<td>{{lc.parentId}}</td>
 					<td class="text-center">
 						<ul class="icons-list">
-							<li><a (click)="openUpdateModal(lp.id)"><i class="icon-pencil7"></i></a></li>
-							<li><a (click)="onRemove(lp.id)"><i class="icon-trash"></i></a></li>
+							<li><a (click)="openUpdateModal(lc.id)"><i class="icon-pencil7"></i></a></li>
+							<li><a (click)="onRemove(lc.id)"><i class="icon-trash"></i></a></li>
 						</ul>
 					</td>
 				</tr>
@@ -129,103 +112,32 @@
 <!-- /content area -->
 
 <!-- Large modal -->
-<div *ngIf="showUpdateModal" class="modal fade" id="createProductModal">
+<div *ngIf="showUpdateModal" class="modal fade" id="createModal">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h5 class="modal-title">Thêm thông tin sản phẩm</h5>
+				<h5 class="modal-title">Thêm thông tin loại</h5>
 			</div>
 			<hr>
-			<form *ngIf="doneSetupForm" [formGroup]="frmProduct" (ngSubmit)="OnSubmit(frmProduct.value)"
+			<form *ngIf="doneSetupForm" [formGroup]="frmCategory" (ngSubmit)="OnSubmit(frmCategory.value)"
 				class="form-horizontal">
 				<div class="modal-body" style="padding-left: 50px !important; padding-right:50px !important;">
 					<div class="form-group">
-						<label class="col-lg-3 control-label">Loại<span style="color:red ;">*</span>:</label>
+						<label class="col-lg-3 control-label">Tên loại<span style="color:red ;">*</span>:</label>
 						<div class="col-lg-9">
-							<select formControlName="txt_category_Id" class="form-control">
-                <option value="" disabled selected>Chọn một loại</option>
-                <option *ngFor="let lc of list_category" value="{{lc.id}}">{{lc.name}}</option>
-              </select>
-              <div *ngIf="category_Id.invalid && (category_Id.dirty || category_Id.touched)">
-								<div *ngIf="category_Id.errors?.['required']" style="color:red ;">Bạn phải chọn một loại</div>
-						  </div>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-3 control-label">Tên sản phẩm<span style="color:red ;">*</span>:</label>
-						<div class="col-lg-9">
-							<input formControlName="txt_name" type="text" class="form-control" placeholder="Tên sản phẩm">
+							<input formControlName="txt_name" type="text" class="form-control" placeholder="Tên loại">
 							<div *ngIf="name.invalid && (name.dirty || name.touched)">
-								<div *ngIf="name.errors?.['required']" style="color:red ;">Tên sản phẩm không được rỗng</div>
+								<div *ngIf="name.errors?.['required']" style="color:red ;">Tên loại không được rỗng</div>
 								<div *ngIf="name.errors?.['minlength']" style="color:red ;">
-									Tên sản phẩm không được nhỏ hơn 3 ký tự
+									Tên loại không được nhỏ hơn 3 ký tự
 								</div>
 								<div *ngIf="name.errors?.['maxlength']" style="color:red ;">
-									Tên sản phẩm không được lớn hơn 250 ký tự
+									Tên loại không được lớn hơn 250 ký tự
 								</div>
 						  </div>
 					  </div>
           </div>
-          <div class="form-group">
-						<label class="col-lg-3 control-label">Mô tả:</label>
-						<div class="col-lg-9">
-							<input formControlName="txt_description" type="text" class="form-control" placeholder="Mô tả">
-							<div *ngIf="description.invalid && (description.dirty || description.touched)">
-								<div *ngIf="description.errors?.['minlength']" style="color:red ;">
-									Mô tả không được nhỏ hơn 3 ký tự
-								</div>
-						  </div>
-					  </div>
-          </div>
-          <div class="form-group">
-						<label class="col-lg-3 control-label">Ảnh:</label>
-						<div class="col-lg-9">
-							<div class="media no-margin-top">
-								<div class="media-left">
-									<img  src="{{imagePreview}}" style="width: 58px; height: 58px;" class="img-rounded" alt="">
-								</div>
-								<div class="media-body">
-									<input formControlName="txt_image" (change)="upload($event)" accept=".jpg,.png,.jpeg,.gif,.bmp,.tif,.tiff"
-										type="file" class="file-styled">
-									<span class="help-block">Định dạng được chấp nhận: gif, png, jpg. Kích thước tệp tối đa 2Mb</span>
-								</div>
-							</div>
-						</div>
-					</div>
-          <div class="form-group">
-						<label class="col-lg-3 control-label">Nhà sản xuất<span style="color:red ;">*</span>:</label>
-						<div class="col-lg-9">
-							<select formControlName="txt_producer_Id" class="form-control"  place-holder="a">
-                <option value="" disabled selected>Chọn một nhà sản xuất</option>
-                <option *ngFor="let lpcer of list_producer" value="{{lpcer.id}}">{{lpcer.name}}</option>
-              </select>
-              <div *ngIf="producer_Id.invalid && (producer_Id.dirty || producer_Id.touched)">
-								<div *ngIf="producer_Id.errors?.['required']" style="color:red ;">Bạn phải chọn một nhà sản xuất</div>
-						  </div>
-						</div>
-					</div>
-          <div class="form-group">
-						<label class="col-lg-3 control-label">Đơn giá<span style="color:red ;">*</span>:</label>
-						<div class="col-lg-9">
-							<input formControlName="txt_price" type="number" class="form-control" placeholder="Đơn giá">
-              <div *ngIf="price.invalid && (price.dirty || price.touched)">
-                <div *ngIf="price.errors?.['required']" style="color:red ;">Đơn giá không được rỗng</div>
-							</div>
-						</div>
-					</div>
-          <div class="form-group">
-						<label class="col-lg-3 control-label">Đơn vị tính<span style="color:red ;">*</span>:</label>
-						<div class="col-lg-9">
-							<select formControlName="txt_unit_Id" class="form-control"  place-holder="a">
-                <option value="" disabled selected>Chọn một đơn vị tính</option>
-                <option *ngFor="let lu of list_unit" value="{{lu.id}}">{{lu.name}}</option>
-              </select>
-							<div *ngIf="unit_Id.invalid && (unit_Id.dirty || unit_Id.touched)">
-                <div *ngIf="unit_Id.errors?.['required']" style="color:red ;">Đơn vị tính không được rỗng</div>
-							</div>
-						</div>
-					</div>
           <div class="form-group">
 						<label class="col-lg-3 control-label">Trạng thái<span style="color:red ;">*</span>:</label>
 						<div class="col-lg-9">
@@ -239,11 +151,35 @@
 							</div>
 						</div>
 					</div>
+          <div class="form-group">
+						<label class="col-lg-3 control-label">Ảnh:</label>
+						<div class="col-lg-9">
+							<div class="media no-margin-top">
+								<div class="media-left">
+									<img  src="{{imagePreview}}" style="width: 58px; height: 58px;" class="img-rounded" alt="">
+								</div>
+								<div class="media-body">
+									<input (change)="upload($event)" accept=".jpg,.png,.jpeg,.gif,.bmp,.tif,.tiff"
+										type="file" class="file-styled">
+									<span class="help-block">Định dạng được chấp nhận: gif, png, jpg. Kích thước tệp tối đa 2Mb</span>
+								</div>
+							</div>
+						</div>
+					</div>
+          <div class="form-group">
+						<label class="col-lg-3 control-label">Loại cha<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<select formControlName="txt_parentId" class="form-control">
+                <option value="" disabled selected>Chọn một loại cha</option>
+                <option *ngFor="let ac of allCategory" value="{{ac.id}}">{{ac.name}}</option>
+              </select>
+						</div>
+					</div>
 				</div>
 				<hr>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-link" (click)="closeModal()">Đóng</button>
-					<button type="submit" class="btn btn-primary" [disabled]="frmProduct.invalid">Lưu lại</button>
+					<button type="submit" class="btn btn-primary" [disabled]="frmCategory.invalid">Lưu lại</button>
 				</div>
 			</form>
 		</div>

@@ -39,18 +39,18 @@
 						<div class="form-group">
 							<label class="col-lg-2 control-label" style="text-align:right ;">Họ tên:</label>
 							<div class="col-lg-8">
-								<input formControlName="txt_hoten" type="text" class="form-control" placeholder="Họ tên">
+								<input formControlName="txt_name" type="text" class="form-control" placeholder="Họ tên">
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-lg-2 control-label" style="text-align:right ;">Tài khoản:</label>
 							<div class="col-lg-3">
-								<input formControlName="txt_taikhoan" type="text" class="form-control" placeholder="Tài khoản">
+								<input formControlName="txt_userName" type="text" class="form-control" placeholder="Tài khoản">
 							</div>
 							<label class="col-lg-2 control-label" style="text-align:right ;">Loại quyền:</label>
 							<div class="col-lg-3">
-								<select formControlName="txt_loaiquyen" class="LoaiQuyen">
-									<option [value]="'All'">Tất cả</option>
+								<select formControlName="txt_role" class="form-control">
+									<option [value]="''">Tất cả</option>
 									<option [value]="'Admin'">Admin</option>
 									<option [value]="'User'">User</option>
 								</select>
@@ -68,7 +68,7 @@
 
 
 	<!-- Basic datatable -->
-	<div class="panel panel-flat">
+	<div class="panel panel-flat" style="overflow-x: auto;">
 		<div class="panel-heading">
 			<h5 class="panel-title">DANH SÁCH THÔNG TIN NGƯỜI DÙNG</h5>
 		</div>
@@ -76,25 +76,51 @@
 		<table class="table datatable-basic">
 			<thead>
 				<tr>
-					<th>Họ tên</th>
-					<th>Địa chỉ</th>
-					<th>Số điện thoại</th>
-					<th>Tên tài khoản</th>
-					<th>Trạng thái</th>
+					<th>Tài khoản</th>
+					<th>Mật khẩu</th>
+					<th>Ngày bắt đầu</th>
+					<th>Ngày kết thúc</th>
+					<th>Trạng thái tk</th>
+          <th>Quyền</th>
+          <th>User Id</th>
+          <th>Họ tên</th>
+          <th>Ngày sinh</th>
+          <th>Giới tính</th>
+          <th>Ảnh</th>
+          <th>Địa chỉ</th>
+          <th>Email</th>
+          <th>Điện thoại</th>
+          <th>Trạng thái nd</th>
 					<th class="text-center">Hành động</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr *ngFor="let ur of list_users">
-					<td>{{ur.hoTen}}</td>
-					<td>{{ur.diaChi}}</td>
-					<td>{{ur.dienThoai}}</td>
-					<td>{{ur.taiKhoan}}</td>
-					<td><span class="label label-success">Active</span></td>
+				<tr *ngFor="let lu of list_user">
+					<td>{{lu.userName}}</td>
+					<td>{{lu.passWord}}</td>
+					<td >{{lu.startDate | date : " dd-MM-yyyy"}}</td>
+					<td>{{lu.endDate | date : " dd-MM-yyyy"}}</td>
+					<td>
+            <span *ngIf="lu.status_Account==0" class="label label-success">Không kích hoạt</span>
+            <span *ngIf="lu.status_Account==1" class="label label-success">Kích Hoạt</span>
+          </td>
+					<td>{{lu.role}}</td>
+					<td>{{lu.user_Id}}</td>
+					<td>{{lu.name}}</td>
+					<td>{{lu.dateOfBirth | date : " dd-MM-yyyy"}}</td>
+					<td>{{lu.gioiTinh}}</td>
+					<td><img src="{{lu.image}}" height="100%;" width="100px" alt=""></td>
+					<td>{{lu.address}}</td>
+					<td>{{lu.phone}}</td>
+					<td>{{lu.email}}</td>
+          <td>
+            <span *ngIf="lu.status_User==0" class="label label-success">Không kích hoạt</span>
+            <span *ngIf="lu.status_User==1" class="label label-success">Kích Hoạt</span>
+          </td>
 					<td class="text-center">
 						<ul class="icons-list">
-							<li><a (click)="openUpdateModal(ur.maNguoiDung)"><i class="icon-pencil7"></i></a></li>
-							<li><a (click)="onRemove(ur.maNguoiDung)"><i class="icon-trash"></i></a></li>
+							<li><a (click)="openUpdateModal(lu.user_Id)"><i class="icon-pencil7"></i></a></li>
+							<li><a (click)="onRemove(lu.user_Id)"><i class="icon-trash"></i></a></li>
 						</ul>
 					</td>
 				</tr>
@@ -102,19 +128,12 @@
 		</table>
 	</div>
 	<!-- /basic datatable -->
-	<!-- Footer -->
-	<div class="footer text-muted">
-		&copy; 2015. <a href="#">Limitless Web App Kit</a> by <a href="http://themeforest.net/user/Kopyov"
-			target="_blank">Eugene Kopyov</a>
-	</div>
-	<!-- /footer -->
-
 </div>
 <!-- /content area -->
 
 
 <!-- Large modal -->
-<div *ngIf="showUpdateModal" class="modal fade" id="createUserModal">
+<div *ngIf="showUpdateModal" class="modal fade" id="createModal">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -125,16 +144,103 @@
 			<form *ngIf="doneSetupForm" [formGroup]="frmUser" (ngSubmit)="OnSubmit(frmUser.value)"
 				class="form-horizontal">
 				<div class="modal-body" style="padding-left: 50px !important; padding-right:50px !important;">
+          <div class="form-group">
+						<label class="col-lg-3 control-label">Tài khoản<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_userName" type="text" class="form-control"
+								placeholder="Tài khoản">
+							<div *ngIf="userName.invalid && (userName.dirty || userName.touched)">
+								<div *ngIf="userName.errors?.['required']" style="color:red ;">Tài khoản không được rỗng
+								</div>
+								<div *ngIf="userName.errors?.['minlength']" style="color:red ;">
+									Tài khoản không được nhỏ hơn 5 ký tự
+								</div>
+								<div *ngIf="userName.errors?.['maxlength']" style="color:red ;">
+									Tài khoản không được lớn hơn 50 ký tự
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Mật khẩu<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_passWord" type="password" class="form-control"
+								placeholder="Mật khẩu">
+							<div *ngIf="passWord.invalid && (passWord.dirty || passWord.touched)">
+								<div *ngIf="passWord.errors?.['required']" style="color:red ;">Mật khẩu là bắt buộc</div>
+								<div *ngIf="passWord.errors?.['passWord']" style="color:red ;"> Độ dài mật khẩu tối thiệu
+									phải là 6 ký tự và
+									phải chứa ký tự đặc biệt @#!$%&*</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Nhập lại mật khẩu<span
+								style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_rewrite_Password" type="password" class="form-control"
+								placeholder="Nhập lại mật khẩu">
+							<div *ngIf="rewrite_Password.invalid && (rewrite_Password.dirty || rewrite_Password.touched)">
+								<div *ngIf="rewrite_Password.errors?.['required']" style="color:red ;">Xác nhận lại mật
+									khẩu là bắt buộc</div>
+								<div *ngIf="rewrite_Password.errors?.['matching']" style="color:red ;">Xác thực lại mật
+									khẩu không đúng</div>
+							</div>
+						</div>
+					</div>
+          <div class="form-group">
+						<label class="col-lg-3 control-label">Ngày bắt đầu<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_startDate" type="date" class="form-control"placeholder="Ngày sinh">
+							<div *ngIf="startDate.invalid && (startDate.dirty || startDate.touched)">
+								<div *ngIf="startDate.errors?.['required']" style="color:red ;">Ngày bắt đầu không được rỗng
+								</div>
+							</div>
+						</div>
+					</div>
+          <div class="form-group">
+						<label class="col-lg-3 control-label">Ngày kết thúc<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+							<input formControlName="txt_endDate" type="date" class="form-control">
+							<div *ngIf="endDate.invalid && (endDate.dirty || endDate.touched)">
+								<div *ngIf="endDate.errors?.['required']" style="color:red ;">Ngày kết thúc không được rỗng
+								</div>
+							</div>
+						</div>
+					</div>
+          <div class="form-group">
+						<label class="col-lg-3 control-label">Trạng thái tài khoản<span style="color:red ;">*</span>:</label>
+						<div class="col-lg-9">
+              <select formControlName="txt_status_Account" class="form-control">
+                <option value="" disabled selected>Chọn trạng thái tài khoản</option>
+                <option value="1">Kích hoạt</option>
+                <option value="0">Không kích hoạt</option>
+              </select>
+							<div *ngIf="status_Account.invalid && (status_Account.dirty || status_Account.touched)">
+                <div *ngIf="status_Account.errors?.['required']" style="color:red ;">Bạn phải chọn trạng thái</div>
+							</div>
+						</div>
+					</div>
+          <div class="form-group">
+						<label class="col-lg-3 control-label">Loại quyền:</label>
+						<div class="col-lg-9">
+							<select formControlName="txt_role" class="form-control">
+								<option value="Admin">Admin</option>
+								<option value="User">User</option>
+							</select>
+						</div>
+					</div>
 					<div class="form-group">
 						<label class="col-lg-3 control-label">Họ tên<span style="color:red ;">*</span></label>
 						<div class="col-lg-9">
-							<input formControlName="txt_hoten" type="text" class="form-control" placeholder="Họ tên">
-							<div *ngIf="hoten.invalid && (hoten.dirty || hoten.touched)">
-								<div *ngIf="hoten.errors?.['required']" style="color:red ;">Họ tên không được rỗng</div>
-								<div *ngIf="hoten.errors?.['minlength']" style="color:red ;">
+							<input formControlName="txt_name" type="text" class="form-control" placeholder="Họ tên">
+							<div *ngIf="name.invalid && (name.dirty || name.touched)">
+								<div *ngIf="name.errors?.['required']" style="color:red ;">Họ tên không được rỗng</div>
+								<div *ngIf="name.errors?.['minlength']" style="color:red ;">
 									Họ tên không được nhỏ hơn 3 ký tự
 								</div>
-								<div *ngIf="hoten.errors?.['maxlength']" style="color:red ;">
+								<div *ngIf="name.errors?.['maxlength']" style="color:red ;">
 									Họ tên không được lớn hơn 250 ký tự
 								</div>
 							</div>
@@ -143,10 +249,9 @@
 					<div class="form-group">
 						<label class="col-lg-3 control-label">Ngày sinh<span style="color:red ;">*</span>:</label>
 						<div class="col-lg-9">
-							<input formControlName="txt_ngaysinh" type="date" class="form-control"
-								placeholder="Ngày sinh">
-							<div *ngIf="ngaysinh.invalid && (ngaysinh.dirty || ngaysinh.touched)">
-								<div *ngIf="ngaysinh.errors?.['required']" style="color:red ;">Ngày sinh không được rỗng
+							<input formControlName="txt_dateOfBirth" type="date" class="form-control">
+							<div *ngIf="dateOfBirth.invalid && (dateOfBirth.dirty || dateOfBirth.touched)">
+								<div *ngIf="dateOfBirth.errors?.['required']" style="color:red ;">Ngày sinh không được rỗng
 								</div>
 							</div>
 						</div>
@@ -155,22 +260,35 @@
 						<label class="col-lg-3 control-label">Giới tính<span style="color:red ;">*</span>:</label>
 						<div class="col-lg-9">
 							<label class="radio-inline">
-								<input formControlName="txt_gioitinh" type="radio" class="styled" name="txt_gioitinh"
-									checked="checked" value="Nam">
+								<input formControlName="txt_gioiTinh" type="radio" class="styled" value="Nam">
 								Nam
 							</label>
 
 							<label class="radio-inline">
-								<input formControlName="txt_gioitinh" type="radio" class="styled" name="txt_gioitinh"
-									value="Nữ">
+								<input formControlName="txt_gioiTinh" type="radio" class="styled"value="Nữ">
 								Nữ
 							</label>
+						</div>
+					</div>
+          <div class="form-group">
+						<label class="col-lg-3 control-label">Ảnh:</label>
+						<div class="col-lg-9">
+							<div class="media no-margin-top">
+								<div class="media-left">
+									<img  src="{{imagePreview}}" style="width: 58px; height: 58px;" class="img-rounded" alt="">
+								</div>
+								<div class="media-body">
+									<input (change)="upload($event)" accept=".jpg,.png,.jpeg,.gif,.bmp,.tif,.tiff"
+										type="file" class="file-styled">
+									<span class="help-block">Định dạng được chấp nhận: gif, png, jpg. Kích thước tệp tối đa 2Mb</span>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-lg-3 control-label">Địa chỉ:</label>
 						<div class="col-lg-9">
-							<input formControlName="txt_diachi" type="text" class="form-control" placeholder="Địa chỉ">
+							<input formControlName="txt_address" type="text" class="form-control" placeholder="Địa chỉ">
 						</div>
 					</div>
 					<div class="form-group">
@@ -186,102 +304,28 @@
 					<div class="form-group">
 						<label class="col-lg-3 control-label">Điện thoại:</label>
 						<div class="col-lg-9">
-							<input formControlName="txt_dienthoai" type="text" class="form-control"
+							<input formControlName="txt_phone" type="text" class="form-control"
 								placeholder="Điện thoại">
-							<div *ngIf="dienthoai.invalid && (dienthoai.dirty || dienthoai.touched)">
-								<div *ngIf="dienthoai.errors?.['pattern']" style="color:red ;">Không đúng định dạng số
+							<div *ngIf="phone.invalid && (phone.dirty || phone.touched)">
+								<div *ngIf="phone.errors?.['pattern']" style="color:red ;">Không đúng định dạng số
 									điện thoại!</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="form-group">
-						<label class="col-lg-3 control-label">Tài khoản<span style="color:red ;">*</span>:</label>
+          <div class="form-group">
+						<label class="col-lg-3 control-label">Trạng thái người dùng<span style="color:red ;">*</span>:</label>
 						<div class="col-lg-9">
-							<input formControlName="txt_taikhoan" type="text" class="form-control"
-								placeholder="Tài khoản">
-							<div *ngIf="taikhoan.invalid && (taikhoan.dirty || taikhoan.touched)">
-								<div *ngIf="taikhoan.errors?.['required']" style="color:red ;">Tài khoản không được rỗng
-								</div>
-								<div *ngIf="taikhoan.errors?.['minlength']" style="color:red ;">
-									Tài khoản không được nhỏ hơn 5 ký tự
-								</div>
-								<div *ngIf="taikhoan.errors?.['maxlength']" style="color:red ;">
-									Tài khoản không được lớn hơn 50 ký tự
-								</div>
+              <select formControlName="txt_status_User" class="form-control">
+                <option value="" disabled selected>Chọn trạng thái</option>
+                <option value="1">Kích hoạt</option>
+                <option value="0">Không kích hoạt</option>
+              </select>
+							<div *ngIf="status_User.invalid && (status_User.dirty || status_User.touched)">
+                <div *ngIf="status_User.errors?.['required']" style="color:red ;">Bạn phải chọn trạng thái</div>
 							</div>
 						</div>
 					</div>
-
-					<div class="form-group">
-						<label class="col-lg-3 control-label">Mật khẩu<span style="color:red ;">*</span>:</label>
-						<div class="col-lg-9">
-							<input formControlName="txt_matkhau" type="password" class="form-control"
-								placeholder="Mật khẩu">
-							<div *ngIf="matkhau.invalid && (matkhau.dirty || matkhau.touched)">
-								<div *ngIf="matkhau.errors?.['required']" style="color:red ;">Mật khẩu là bắt buộc</div>
-								<div *ngIf="matkhau.errors?.['matkhau']" style="color:red ;"> Độ dài mật khẩu tối thiệu
-									phải là 6 ký tự và
-									phải chứa ký tự đặc biệt @#!$%&*</div>
-							</div>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-3 control-label">Nhập lại mật khẩu<span
-								style="color:red ;">*</span>:</label>
-						<div class="col-lg-9">
-							<input formControlName="txt_nhaplai_matkhau" type="password" class="form-control"
-								placeholder="Nhập lại mật khẩu">
-							<div *ngIf="nhaplaimatkhau.invalid && (nhaplaimatkhau.dirty || nhaplaimatkhau.touched)">
-								<div *ngIf="nhaplaimatkhau.errors?.['required']" style="color:red ;">Xác nhận lại mật
-									khẩu là bắt buộc</div>
-								<div *ngIf="nhaplaimatkhau.errors?.['matching']" style="color:red ;">Xác thực lại mật
-									khẩu không đúng</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-lg-3 control-label">Loại quyền:</label>
-						<div class="col-lg-9">
-							<select formControlName="txt_loaiquyen" [(ngModel)]="loaiQuyen" class="LoaiQuyen">
-								<option [value]="'Admin'">Admin</option>
-								<option [value]="'User'">User</option>
-							</select>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-3 control-label">Ảnh đại diện:</label>
-						<div class="col-lg-9">
-							<div class="media no-margin-top">
-								<div class="media-left">
-									<a href="#"><img
-											[src]="user && user.anhDaiDien?user.anhDaiDien:'assets/images/placeholder.jpg'"
-											style="width: 58px; height: 58px;" class="img-rounded" alt=""></a>
-								</div>
-
-								<div class="media-body">
-									<input (change)="upload($event)" accept=".jpg,.png,.jpeg,.gif,.bmp,.tif,.tiff"
-										type="file" class="file-styled">
-									<span class="help-block">Accepted formats: gif, png, jpg. Max file size 2Mb</span>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- <div class="form-group">
-						<label class="col-lg-3 control-label">Thông tin khác:</label>
-						<div class="col-lg-9">
-							<textarea formControlName="txt_thongtinkhac" rows="5" cols="5" class="form-control"
-								placeholder="Nhập thông tin khác tại đây"></textarea>
-						</div>
-					</div> -->
-					<div class="form-group">
-						<label class="col-lg-3 control-label">Thông tin khác:</label>
-						<div class="col-lg-9">
-							<!-- <ckeditor formControlName="txt_thongtinkhac" [config]="ckeConfig"></ckeditor> -->
-						</div>
-					</div>
-
 				</div>
 				<hr>
 				<div class="modal-footer">
